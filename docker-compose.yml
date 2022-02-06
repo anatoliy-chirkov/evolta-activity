@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  nginx:
+    image: nginx:1.21-alpine
+    container_name: evolta_activity
+    restart: unless-stopped
+    networks:
+      - evolta
+      - evolta_activity
+    depends_on:
+      - php
+    volumes:
+      - ./:/opt/app
+      - ./build/nginx/config:/etc/nginx/conf.d
+
+  mysql:
+    image: mysql:8.0.17
+    container_name: evolta_activity_mysql
+    restart: unless-stopped
+    networks:
+      - evolta_activity
+    volumes:
+      - ./storage/database:/var/lib/mysql
+    env_file:
+      - .env
+
+  php:
+    build:
+      context: .
+      dockerfile: build/php/Dockerfile
+    container_name: evolta_activity_php
+    networks:
+      - evolta_activity
+    depends_on:
+      - mysql
+    volumes:
+      - .:/opt/app:delegated
+    env_file:
+      - .env
+
+networks:
+  evolta_activity:
+    driver: "bridge"
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
+  evolta:
+    external:
+      name: evolta
