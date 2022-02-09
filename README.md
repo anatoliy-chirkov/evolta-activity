@@ -1,4 +1,4 @@
-# Evolta Activity Logger
+# Laravel Logger
 
 ### Setup
 This app works in local Docker network: `evolta`,
